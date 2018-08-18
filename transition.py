@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Aug 16 19:05:17 2018
-
+    to use this funtion, call "transition()"
 @author: onlyjackfrost
 """
 import requests
@@ -9,9 +9,7 @@ import json
 from googletrans import Translator
 
 # =============================================================================
-#  
-#       basic method
-#       
+#       basic method 
 # =============================================================================
 def Geolocation_request():
     API_key = "AIzaSyBmvshA169XyDvEACKgAgyFbOzbmedBo1k"
@@ -100,7 +98,7 @@ def tram_detail_parser(bus_detail):
     return shortname
   
 # =============================================================================
-#  transition algorithm method
+#       transition  method
 # =============================================================================
 def bus_algorithm(destination):
     user_location = Geolocation_request()
