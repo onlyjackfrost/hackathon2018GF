@@ -6,7 +6,6 @@ Created on Thu Aug 16 19:05:17 2018
 """
 import requests
 import json
-from googletrans import Translator
 
 # =============================================================================
 #       basic method 
@@ -14,11 +13,11 @@ from googletrans import Translator
 def Geolocation_request():
     API_key = "AIzaSyBmvshA169XyDvEACKgAgyFbOzbmedBo1k"
     URL = "https://www.googleapis.com/geolocation/v1/geolocate?key="+API_key
-    para={
-      "macAddress": "54:A0:50:6B:86:52"
-    }
-    r = requests.post(URL, json=para)
-    js = json.loads(r.content)
+#    para={
+#      "macAddress": "54:A0:50:6B:86:52"
+#    }
+    r = requests.post(URL)
+    js = json.loads(r.content.decode())
     user_location = (js['location']['lat'],js['location']['lng'])
     return user_location
 
@@ -33,7 +32,7 @@ def direction_request(user_location , destination,transit_mode):
            +"&language=zh-TW" \
            +"&key="+API_key
     r = requests.post(URL)
-    content = json.loads(r.content)
+    content = json.loads(r.content.decode())
 #    print (json.dumps(content, indent=4, sort_keys=True))
     return content
 
@@ -41,11 +40,16 @@ def cost_parser(detail):
     """
         parse the duration and cost for the transit
     """
-    text = detail["routes"][0]["fare"]["text"][1:-3]
-    #[x for x in xyz if x in a]
-    for step in detail["routes"][0]["legs"][0]["steps"]:
-        if step["travel_mode"] == "TRANSIT":
-            duration =step["duration"]["text"]
+    try:
+        text = detail["routes"][0]["fare"]["text"][1:-3]
+    except KeyError:
+        text = "0"
+    try:
+        for step in detail["routes"][0]["legs"][0]["steps"]:
+            if step["travel_mode"] == "TRANSIT":
+                duration =step["duration"]["text"]
+    except KeyError:
+        duration = "不知道多久"
     cost = [text,duration]
     return cost
 
@@ -90,7 +94,7 @@ def tram_detail_parser(bus_detail):
         except KeyError:
             shortname = []
     #write file
-    with open("bus_detail.txt",'w')as f:
+    with open("tram_detail.txt",'w')as f:
         if not shortname:
             f.write("距離很近，不用搭捷運")
         else:
@@ -108,10 +112,10 @@ def bus_algorithm(destination):
     user_location = Geolocation_request()
     #get the transit recommandation
     bus_detail = direction_request(user_location,destination,transit_mode)
-    #parse the cost and time 
-    cost = cost_parser(bus_detail)
     #parse for the detail transit information
     bus_shortname = bus_detail_parser(bus_detail)
+    #parse the cost and time 
+    cost = cost_parser(bus_detail)
     return cost, bus_detail, bus_shortname
 
 def tram_algorithm(destination):
@@ -122,10 +126,10 @@ def tram_algorithm(destination):
     user_location = Geolocation_request()
     #get the transit recommandation
     tram_detail = direction_request(user_location,destination,transit_mode)
-    #parse the cost and time 
-    cost = cost_parser(tram_detail)
     #parse for the detail transit information
     tram_shortname = tram_detail_parser(tram_detail)
+    #parse the cost and time 
+    cost = cost_parser(tram_detail)
     return cost, tram_detail, tram_shortname
 
 def transition(destination):
