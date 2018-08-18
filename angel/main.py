@@ -4,7 +4,9 @@ import aiy.audio
 import aiy.voicehat
 import time
 import hashlib
+import json
 from ._speaking import speaking, speaking_from_file
+from .transition import transition
 from ._recording import recording
 from ._player import simple_player
 from ._recorder import simple_recorder
@@ -33,24 +35,23 @@ def main():
         button.wait_for_press()
         destination = recording()
 
-        #祥溥的function(destination)
-        #speaking_from_file(檔案名稱)
+        transition(destination)
+        speaking_from_file('transition_cost.txt')
 
         try:
             while True:
-                speaking('請問您想要搭公車、捷運、還是腳踏車')
                 button.wait_for_press()
                 transportation = recording()
 
-                # bus, subway, walking are the keywords for google Maps API
+                # bus, tram, walking are the keywords for google Maps API
                 if transportation=='公車':
-                    #speaking_from_file(destination, 'bus')
+                    speaking_from_file('bus_detail.txt')
                     break
                 elif transportation=='捷運':
-                    #speaking_from_file(destination, 'subway')
+                    speaking_from_file('tram_detail.txt')
                     break
                 elif transportation=='腳踏車':
-                    #speaking_from_file(destination, 'walking')
+                    #speaking_from_file('ubike_detail.txt')
                     break
                 else:
                     speaking('請從公車、捷運、腳踏車中選擇一項')

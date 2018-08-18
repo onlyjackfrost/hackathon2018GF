@@ -6,7 +6,6 @@ Created on Thu Aug 16 19:05:17 2018
 """
 import requests
 import json
-from googletrans import Translator
 
 # =============================================================================
 #       basic method 
@@ -18,7 +17,8 @@ def Geolocation_request():
       "macAddress": "54:A0:50:6B:86:52"
     }
     r = requests.post(URL, json=para)
-    js = json.loads(r.content)
+    js = json.loads(r.content.decode())
+    print(type(r.content.decode()))
     user_location = (js['location']['lat'],js['location']['lng'])
     return user_location
 
@@ -33,7 +33,7 @@ def direction_request(user_location , destination,transit_mode):
            +"&language=zh-TW" \
            +"&key="+API_key
     r = requests.post(URL)
-    content = json.loads(r.content)
+    content = json.loads(r.content.decode())
 #    print (json.dumps(content, indent=4, sort_keys=True))
     return content
 
