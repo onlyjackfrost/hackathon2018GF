@@ -23,32 +23,38 @@ async def ws_to_tts(speaker_queue, lang='zh-tw'):
         sentence = await speaker_queue.get()
     except Exception:
         return 1
-    logger.info('Speaking: Calling gTTS')
+    logger.info('Speaking: ws_to_tts: Calling gTTS')
     tts = gTTS(sentence, lang=lang, lang_check=False)
     led.set_state(led.ON)
     with tempfile.TemporaryFile() as tempf:
         tts.write_to_fp(tempf)
         tempf.seek(0)
-        logger.info('Speaking: Speaking...')
+        logger.info('Speaking: ws_to_tts: Speaking...')
         simple_player.play_bytes(tempf) # simple_player.play_bytes() plays the audio
     led.set_state(led.OFF)
     return 0
 
 # Function read_from_file() added by monmon
 async def read_from_file(speaker_queue, fileName):
-    logger.info('Speaking: Reading from %s.' % fileName)
-    for L in open(fileName,'r',encoding='UTF-8'):
+    logger.info('Speaking: read_from_file: Reading from %s.' % fileName)
+    for L in open(fileName, 'r', encoding='UTF-8'):
         await asyncio.sleep(0.5)
         await speaker_queue.put(L)
         if len(L) == 0:
             break
         logger.info(L)
-
-    logger.info('Speaking: Finish reading from file.')
+    
+    logger.info('Speaking: read_from_file: Finish reading from file.')
 
     return 0;
+# read from input string
+async def read_from_string(speaker_queue, sentence):
+    logger.info('Speaking: read_from_string: %s.' % sentence)
+    await speaker_queue.put(sentence)
+    logger.info('Speaking: read_from_string: Finish reading from string.')
 
-def speaking(fileName):
+
+def speaking_from_file(fileName):
 
     led.set_state(led.PULSE_QUICK)
     loop = asyncio.new_event_loop()
@@ -69,7 +75,29 @@ def speaking(fileName):
     finally:
         loop.close()
         led.set_state(led.OFF)
-    logger.info('Speaking: Done')
+    logger.info('Speaking: speaking_from_file: Done')
+
+def speaking(sentence):
+    led.set_state(led.PULSE_QUICK)
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    speaker_queue = asyncio.Queue()
+    
+    try:
+        loop.run_until_complete(
+                asyncio.gather(read_from_string(speaker_queue, sentence),
+                                ws_to_tts(speaker_queue))
+        )
+
+    except Exception as err:
+        logger.error(err)
+        loop.stop()
+        loop.run_forever()
+
+    finally:
+        loop.close()
+        led.set_state(led.OFF)
+    logger.info('Speaking: speaking: Done')
 
 
 if __name__ == '__main__':
@@ -81,7 +109,7 @@ if __name__ == '__main__':
 
     #button = aiy.voicehat.get_button()
     #button.on_press(speaking('input.txt')) #這樣寫之後按鈕會失效
-    speaking('input.txt')
+    speaking('12.00')
 
     #try:
     #    while True:

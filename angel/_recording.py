@@ -27,23 +27,6 @@ if ws_endpoint is None or ws_token is None:
     raise ValueError('Must provide websocket')
 
 
-#async def ws_to_tts(speaker_queue, lang='zh-tw'):
-#    try:
-#        sentence = await speaker_queue.get()
-#    except Exception:
-#        return 1
-#    logger.info('Calling gTTS')
-#    tts = gTTS(sentence, lang=lang, lang_check=False)
-#    led.set_state(led.ON)
-#    with tempfile.TemporaryFile() as tempf:
-#        tts.write_to_fp(tempf)
-#        tempf.seek(0)
-#        logger.info('Speaking...')
-#        simple_player.play_bytes(tempf)
-#    led.set_state(led.OFF)
-#    return 0
-
-
 async def record_to_buffer(ws_queue):
     logger.info('Recording: Recording from microphone.')
     retcode = await simple_recorder.record_wav(ws_queue)
