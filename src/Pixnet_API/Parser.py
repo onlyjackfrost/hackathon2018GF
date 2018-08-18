@@ -111,7 +111,8 @@ class Pixnet_API(object):
         #     view_list = random.sample(self._hsinchu_hot_view, qty)
         else:
             view_list = 'moabo'
-        return ('這附近景點是' + str(view_list))
+        view_str = " ".join(str(x) for x in view_list)
+        return ('這附近景點是' + view_str)
 
     def _CompareWithTop10Food(self,user_Say,qty): # return Food , qty :數量
         food_list = []
@@ -123,7 +124,8 @@ class Pixnet_API(object):
         #     food_list = random.sample(self._hsinchu_hot_food, qty)
         else:
             food_list = '都是puan'
-        return ('這附近美食'+ str(food_list))
+        food_str = " ".join(str(x) for x in food_list)
+        return ('這附近美食'+ food_str)
 
     def _FoodRankViaPixnet(self,area,qty): # data : dict, area : str, return view or food.
         _food_list = []
@@ -138,7 +140,8 @@ class Pixnet_API(object):
         self._parser(foodRes, area)
         for k, v in self._taipei_hot_food.items():
             if len(_food_list) == qty:
-                return (_food_list)
+                _food_str = " ".join(str(x) for x in _food_list)
+                return (_food_str)
             if v > 0:
                 _food_list.append(k)
             else:
@@ -157,7 +160,8 @@ class Pixnet_API(object):
         self._parser(viewRes,area)
         for k,v in self._taipei_hot_view.items():
             if len(_view_list) == qty:
-                return (_view_list)
+                _view_str = " ".join(str(x) for x in _view_list)
+                return (_view_str)
             if v >0 :
                 _view_list.append(k)
             else:
@@ -209,10 +213,11 @@ if __name__=='__main__':
 
     _area = '中正紀念堂'
     f = pixnet._CompareWithTop10Food(_area,3)
-    print ('_CompareWithTop10Food = ',f)
+
+    print ('_CompareWithTop10Food = ', f)
 
     view_list = pixnet._ViewRankViaPixnet(_area,3)
-    print ('_ViewRankViaPixnet = ',view_list)
+    print ('_ViewRankViaPixnet = ', view_list)
 
     food_list = pixnet._FoodRankViaPixnet(_area,3)
-    print ('_FoodRankViaPixnet = ',food_list)
+    print ('_FoodRankViaPixnet = ', food_list)
