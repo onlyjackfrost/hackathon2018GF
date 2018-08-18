@@ -25,9 +25,9 @@ def main():
     speaking_from_file('intro.txt')
     button.wait_for_press()
     asking = recording()
-    if asking == '景點':
+    if asking == '旅遊':
         logger.info('Main: Asking about sightseeing spot')
-        speaking('景點還沒接上喔')
+        speaking('旅遊還沒接上喔')
 
     elif asking == '交通':
         logger.info('Main: Asking about transportation')
