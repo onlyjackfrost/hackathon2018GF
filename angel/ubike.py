@@ -4,7 +4,7 @@ Created on Sat Aug 18 20:19:11 2018
 
 @author: user
 """
-import pandas as pd
+#import pandas as pd
 import json
 import requests
 from math import radians, cos, sin, asin, sqrt
@@ -56,19 +56,21 @@ def direction_request_bike(user_location , destination):
 #    print (json.dumps(content, indent=4, sort_keys=True))
     return content
 
-def process_data():
-    df = pd.read_csv("YouBike.csv",encoding='big5')
-    stop_info = []
-    for i in range(0,len(df)):
-        sna = df["sna"][i]
-        lat = df["lat"][i]
-        lng = df["lng"][i]
-        ar = df["ar"][i]
-        info = [sna,[lat,lng],ar]
-        stop_info.append(info)
-    a = json.dumps(stop_info)
-    with open('ubike_stop_info.txt','w')as f:
-        f.write(a) 
+# =============================================================================
+# def process_data():
+#     df = pd.read_csv("YouBike.csv",encoding='big5')
+#     stop_info = []
+#     for i in range(0,len(df)):
+#         sna = df["sna"][i]
+#         lat = df["lat"][i]
+#         lng = df["lng"][i]
+#         ar = df["ar"][i]
+#         info = [sna,[lat,lng],ar]
+#         stop_info.append(info)
+#     a = json.dumps(stop_info)
+#     with open('ubike_stop_info.txt','w')as f:
+#         f.write(a) 
+# =============================================================================
     
 def bike(destination):
     with open(PJ(this_dir,'ubike_stop_info.txt'),'r')as f:

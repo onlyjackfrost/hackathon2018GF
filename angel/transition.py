@@ -150,11 +150,37 @@ def transition(destination):
         use_bike = 0
     else:
         use_bike = 1
+    print(bus_shortname,"  ",tram_shortname)
     with open("transition_cost.txt","w") as f:
-        if not tram_shortname or not bus_shortname:
+        condition = [not tram_shortname, not bus_shortname, use_bike]
+        if condition == [False,False,0]:
             f.write("距離很近，你問人然後走路吧")
             out = 0
-        if bus_shortname and tram_shortname and use_bike == 1:
+        if condition == [False,False,1]:
+            f.write("很抱歉，你只能騎腳踏車，呵呵")
+            out = 1
+        if condition == [False,True,1]:
+            f.write("搭公車要"+bus_cost[1]+","+bus_cost[0]+"元"+
+                    "你要搭公車、還是騎最環保又健康的腳踏車")
+            out = 1
+        if condition == [False,True,0]:
+            f.write("搭公車要"+bus_cost[1]+","+bus_cost[0]+"元"
+                    +"要搭公車請說公車兩個字")
+            out = 1
+        if condition == [True,True,0]:
+            f.write("搭捷運要"+tram_cost[1]+','+tram_cost[0]+"元"+","
+                    "搭公車要"+bus_cost[1]+","+bus_cost[0]+"元"+
+                    "你要搭捷運還是公車")
+            out = 1    
+        if condition == [True,False,0]:
+            f.write("搭捷運要"+tram_cost[1]+','+tram_cost[0]+"元"+","
+                    +"要搭捷運請說捷運兩個字")
+            out = 1  
+        if condition == [True,False,1]:
+            f.write("搭捷運要"+tram_cost[1]+','+tram_cost[0]+"元"+","
+                    +"你要搭捷運還是騎最環保又健康的腳踏車")
+            out = 1 
+        if condition == [True,True,1]:
             f.write("搭捷運要"+tram_cost[1]+','+tram_cost[0]+"元"+","
                     "搭公車要"+bus_cost[1]+","+bus_cost[0]+"元"+
                     "你要搭捷運、公車、還是騎最環保又健康的腳踏車")
@@ -162,5 +188,5 @@ def transition(destination):
     return  out
         
 if __name__ == "__main__":
-    destination = "臺灣師範大學" #for testing
+    destination = "強恕中學" #for testing
     out = transition(destination)
