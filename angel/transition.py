@@ -6,6 +6,7 @@ Created on Thu Aug 16 19:05:17 2018
 """
 import requests
 import json
+from ubike import bike
 
 # =============================================================================
 #       basic method 
@@ -40,10 +41,8 @@ def cost_parser(detail):
     """
         parse the duration and cost for the transit
     """
-    
     text = "0"
     duration = "不知道多久"
-    
     try:
         text = detail["routes"][0]["fare"]["text"][1:-3]
     except KeyError:
@@ -54,7 +53,6 @@ def cost_parser(detail):
                 duration =step["duration"]["text"]
     except KeyError:
         duration = "不知道多久"
-    
     finally :
         cost = [text,duration]
     return cost
@@ -64,9 +62,8 @@ def bus_detail_parser(bus_detail):
         parse the detail information for the transit
         上車站、下車站、公車代號、該班公車發車間隔時間
     """
-
-    shortname = []
     #get route detail
+    shortname = []
     for index in range(0,len(bus_detail["routes"][0]["legs"][0]["steps"])):
         step = bus_detail["routes"][0]["legs"][0]["steps"][index]
         try:
@@ -91,9 +88,7 @@ def tram_detail_parser(bus_detail):
         parse the detail information for the transit
         上車站、下車站、捷運線
     """
-    
     shortname = []
-    
     #get route detail
     for index in range(0,len(bus_detail["routes"][0]["legs"][0]["steps"])):
         step = bus_detail["routes"][0]["legs"][0]["steps"][index]
@@ -143,20 +138,29 @@ def tram_algorithm(destination):
     cost = cost_parser(tram_detail)
     return cost, tram_detail, tram_shortname
 
+def bike_write_file(start_stop, end_stop):
+    with open("bike_detail.txt","w") as f:
+        f.write("你可以到"+start_stop+"租共享單車，然後騎到"+end_stop+"還車")
+    
 def transition(destination):
     bus_cost, bus_detail, bus_shortname = bus_algorithm(destination)
     tram_cost, tram_detail, tram_shortname = tram_algorithm(destination)
+    start_stop, end_stop = bike(destination)
+    if start_stop == end_stop:
+        use_bike = 0
+    else:
+        use_bike = 1
     with open("transition_cost.txt","w") as f:
         if not tram_shortname or not bus_shortname:
             f.write("距離很近，你問人然後走路吧")
             out = 0
-        if bus_shortname and tram_shortname:
+        if bus_shortname and tram_shortname and use_bike == 1:
             f.write("搭捷運要"+tram_cost[1]+','+tram_cost[0]+"元"+","
                     "搭公車要"+bus_cost[1]+","+bus_cost[0]+"元"+
-                    "你要搭捷運、公車、")
+                    "你要搭捷運、公車、還是騎最環保又健康的腳踏車")
             out = 1
     return  out
         
 if __name__ == "__main__":
-    destination = "我"
+    destination = "臺灣師範大學" #for testing
     out = transition(destination)
