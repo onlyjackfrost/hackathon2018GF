@@ -40,9 +40,10 @@ def cost_parser(detail):
     """
         parse the duration and cost for the transit
     """
-
-    text = '0'
-    duration = '不知道多久'
+    
+    text = "0"
+    duration = "不知道多久"
+    
     try:
         text = detail["routes"][0]["fare"]["text"][1:-3]
     except KeyError:
@@ -54,7 +55,8 @@ def cost_parser(detail):
     except KeyError:
         duration = "不知道多久"
     
-    cost = [text,duration]
+    finally :
+        cost = [text,duration]
     return cost
 
 def bus_detail_parser(bus_detail):
@@ -77,7 +79,7 @@ def bus_detail_parser(bus_detail):
             shortname = []
     #write file
     with open("bus_detail.txt",'w')as f:
-        if not shortname:
+        if shortname==[]:
             f.write("距離很近，不用搭公車")
         else:
             f.write("請從"+departure_stop+"站，搭"+shortname+"公車到，"+arrival_stop+"站下車")
@@ -89,8 +91,9 @@ def tram_detail_parser(bus_detail):
         parse the detail information for the transit
         上車站、下車站、捷運線
     """
-
-    shortname=[]
+    
+    shortname = []
+    
     #get route detail
     for index in range(0,len(bus_detail["routes"][0]["legs"][0]["steps"])):
         step = bus_detail["routes"][0]["legs"][0]["steps"][index]
@@ -103,7 +106,7 @@ def tram_detail_parser(bus_detail):
             shortname = []
     #write file
     with open("tram_detail.txt",'w')as f:
-        if not shortname:
+        if shortname==[]:
             f.write("距離很近，不用搭捷運")
         else:
             f.write("請從"+departure_stop+"，搭"+shortname+"到，"+arrival_stop+"下車")
@@ -150,10 +153,10 @@ def transition(destination):
         if bus_shortname and tram_shortname:
             f.write("搭捷運要"+tram_cost[1]+','+tram_cost[0]+"元"+","
                     "搭公車要"+bus_cost[1]+","+bus_cost[0]+"元"+
-                    "你要搭捷運還是公車")
+                    "你要搭捷運、公車、")
             out = 1
-    return out
-
+    return  out
+        
 if __name__ == "__main__":
-    destination = "台北車站"
-    bus_detail, tram_detail, bus_shortname, tram_shortname = transition(destination)
+    destination = "我"
+    out = transition(destination)
