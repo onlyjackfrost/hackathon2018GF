@@ -8,6 +8,7 @@ import json
 from ._speaking import speaking, speaking_from_file
 from .transition import transition
 from ._recording import recording
+from .Parser import Pixnet_API
 from ._player import simple_player
 from ._recorder import simple_recorder
 from .logging import logger
@@ -25,9 +26,37 @@ def main():
     speaking_from_file('intro.txt')
     button.wait_for_press()
     asking = recording()
+    pixnet = Pixnet_API()
+
     if asking == '旅遊':
         logger.info('Main: Asking about sightseeing spot')
-        speaking('旅遊還沒接上喔')
+        speaking('您想要找風景還是美食')
+        button.wait_for_press()
+        findings = recording()
+
+        if findings == '風景':
+            speaking('目的地')
+            button.wait_for_press()
+            destination = recording()
+            #speaking('數量')
+            #button.wait_for_press()
+            #number = recording()
+            number = 3
+
+            output = pixnet._ViewRankViaPixnet(destination, number)
+
+            speaking(output)
+        elif findings == '美食':
+            speaking('目的地')
+            button.wait_for_press()
+            destination = recording()
+            #speaking('數量')
+            #button.wait_for_press()
+            #number = recording()
+            number = 3
+
+            output = pixnet._FoodRankViaPixnet(destination, number)
+            speaking(output)
 
     elif asking == '交通':
         logger.info('Main: Asking about transportation')
