@@ -35,11 +35,11 @@ def main():
         button.wait_for_press()
         destination = recording()
 
-        transition(destination)
+        trans_output = transition(destination)
         speaking_from_file('transition_cost.txt')
 
         try:
-            while True:
+            while trans_output == 1:
                 button.wait_for_press()
                 transportation = recording()
 
