@@ -6,7 +6,9 @@ Created on Thu Aug 16 19:05:17 2018
 """
 import requests
 import json
-from ubike import bike
+import re
+from .ubike import bike
+from .weather import weather
 
 # =============================================================================
 #       basic method 
@@ -64,6 +66,8 @@ def bus_detail_parser(bus_detail):
     """
     #get route detail
     shortname = []
+    town_name_destination = bus_detail["routes"][0]["legs"][0]["end_address"][5:11]
+    town_name_destination = re.sub(r'台','臺',town_name_destination)
     for index in range(0,len(bus_detail["routes"][0]["legs"][0]["steps"])):
         step = bus_detail["routes"][0]["legs"][0]["steps"][index]
         try:
@@ -80,7 +84,7 @@ def bus_detail_parser(bus_detail):
             f.write("距離很近，不用搭公車")
         else:
             f.write("請從"+departure_stop+"站，搭"+shortname+"公車到，"+arrival_stop+"站下車")
-    return shortname
+    return shortname, town_name_destination
 
 
 def tram_detail_parser(bus_detail):
@@ -119,10 +123,10 @@ def bus_algorithm(destination):
     #get the transit recommandation
     bus_detail = direction_request(user_location,destination,transit_mode)
     #parse for the detail transit information
-    bus_shortname = bus_detail_parser(bus_detail)
+    bus_shortname , town_name_destination = bus_detail_parser(bus_detail)
     #parse the cost and time 
     cost = cost_parser(bus_detail)
-    return cost, bus_detail, bus_shortname
+    return cost, bus_detail, bus_shortname, town_name_destination
 
 def tram_algorithm(destination):
     user_location = Geolocation_request()
@@ -143,50 +147,56 @@ def bike_write_file(start_stop, end_stop):
         f.write("你可以到"+start_stop+"租共享單車，然後騎到"+end_stop+"還車")
     
 def transition(destination):
-    bus_cost, bus_detail, bus_shortname = bus_algorithm(destination)
+    bus_cost, bus_detail, bus_shortname, town_name_destination = bus_algorithm(destination)
     tram_cost, tram_detail, tram_shortname = tram_algorithm(destination)
+    #ubike 判斷
     start_stop, end_stop = bike(destination)
     if start_stop == end_stop:
         use_bike = 0
     else:
         use_bike = 1
-    print(bus_shortname,"  ",tram_shortname)
+        bike_write_file(start_stop, end_stop)
+    #下雨判斷
+    dict_avg_rain = weather()
+    brocast = dict_avg_rain[town_name_destination]
+    
     with open("transition_cost.txt","w") as f:
-        condition = [not tram_shortname, not bus_shortname, use_bike]
+        condition = [ tram_shortname !=[],  bus_shortname !=[], use_bike]
+        print(condition)
         if condition == [False,False,0]:
-            f.write("距離很近，你問人然後走路吧")
+            f.write("目的地距離很近，你問人然後走路吧"+brocast)
             out = 0
         if condition == [False,False,1]:
-            f.write("很抱歉，你只能騎腳踏車，呵呵")
+            f.write("很抱歉，你只能騎腳踏車到目的地，要騎腳踏車請說腳踏車"+brocast)
             out = 1
         if condition == [False,True,1]:
             f.write("搭公車要"+bus_cost[1]+","+bus_cost[0]+"元"+
-                    "你要搭公車、還是騎最環保又健康的腳踏車")
+                    "你要搭公車、還是騎最環保又健康的腳踏車"+brocast)
             out = 1
         if condition == [False,True,0]:
             f.write("搭公車要"+bus_cost[1]+","+bus_cost[0]+"元"
-                    +"要搭公車請說公車兩個字")
+                    +"要搭公車請說公車兩個字"+brocast)
             out = 1
         if condition == [True,True,0]:
             f.write("搭捷運要"+tram_cost[1]+','+tram_cost[0]+"元"+","
                     "搭公車要"+bus_cost[1]+","+bus_cost[0]+"元"+
-                    "你要搭捷運還是公車")
+                    "你要搭捷運還是公車"+brocast)
             out = 1    
         if condition == [True,False,0]:
             f.write("搭捷運要"+tram_cost[1]+','+tram_cost[0]+"元"+","
-                    +"要搭捷運請說捷運兩個字")
+                    +"要搭捷運請說捷運兩個字"+brocast)
             out = 1  
         if condition == [True,False,1]:
             f.write("搭捷運要"+tram_cost[1]+','+tram_cost[0]+"元"+","
-                    +"你要搭捷運還是騎最環保又健康的腳踏車")
+                    +"你要搭捷運還是騎最環保又健康的腳踏車"+brocast)
             out = 1 
         if condition == [True,True,1]:
             f.write("搭捷運要"+tram_cost[1]+','+tram_cost[0]+"元"+","
                     "搭公車要"+bus_cost[1]+","+bus_cost[0]+"元"+
-                    "你要搭捷運、公車、還是騎最環保又健康的腳踏車")
+                    "你要搭捷運、公車、還是騎最環保又健康的腳踏車"+brocast)
             out = 1
     return  out
         
 if __name__ == "__main__":
-    destination = "強恕中學" #for testing
+    destination = "台北火車站" #for testing
     out = transition(destination)
