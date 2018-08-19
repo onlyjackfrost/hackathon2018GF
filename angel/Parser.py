@@ -101,9 +101,9 @@ class Pixnet_API(object):
         #                      '鴛鴦谷瀑布群 ': 0}
         # self._hsinchu_hot_food = ['玉龍肉圓']
 
-    def _CompareWithTopView(self,user_say,qty): # return view , qty : 數量
+    def _CompareWithTopView(self,user_Say,qty): # return view , qty : 數量
         view_list = []
-        if user_Say in self._taipei_hot_view.keys() or user_Say in '台北' :
+        if user_Say in self._taipei_hot_view.keys() or user_Say in ['台北','台北市'] :
             view_list = random.sample(self._taipei_hot_view_hot_view, qty)
         # elif user_Say in self._keelung_hot_view.keys() or user_Say in '基隆' :
         #     view_list = random.sample(self._keelung_hot_view, qty)
@@ -116,7 +116,7 @@ class Pixnet_API(object):
 
     def _CompareWithTop10Food(self,user_Say,qty): # return Food , qty :數量
         food_list = []
-        if user_Say in self._taipei_hot_view.keys():
+        if user_Say in self._taipei_hot_view.keys() or user_Say in ['台北','台北市'] :
             food_list = random.sample(self._taipei_hot_food.keys(), qty)
         # elif user_Say in self._keelung_hot_view.keys():
         #     food_list = random.sample(self._keelung_hot_food, qty)
@@ -211,10 +211,14 @@ if __name__=='__main__':
 
     pixnet = Pixnet_API()
 
-    _area = '中正紀念堂'
+    _area = 'forever 21'
     f = pixnet._CompareWithTop10Food(_area,3)
 
     print ('_CompareWithTop10Food = ', f)
+
+    g = pixnet._CompareWithTopView(_area,3)
+
+    print ('_CompareWithTopView = ', g)
 
     view_list = pixnet._ViewRankViaPixnet(_area,3)
     print ('_ViewRankViaPixnet = ', view_list)
