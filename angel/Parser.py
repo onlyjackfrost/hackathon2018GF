@@ -134,7 +134,7 @@ class Pixnet_API(object):
         _food_id = '26'  # 28 國內旅遊, 26:食物
         _rnd_page = '&page=' + str(random.randint(1, 10))
         _filter = '&fileter=top_authors'
-        _dataFormat = '?&apiversion=2&format=json&per_page=450' + _filter  # +_rnd_page#
+        _dataFormat = '?&apiversion=2&format=json&per_page=20' + _filter  # +_rnd_page#
 
         foodRes = self._getHTTP(_url, _attr, _food_id, _dataFormat)
         self._parser(foodRes, area)
@@ -154,7 +154,7 @@ class Pixnet_API(object):
         _view_id = '28'  # 28 國內旅遊, 26:食物
         _rnd_page = '&page=' + str(random.randint(1, 10))
         _filter = '&fileter=top_authors'
-        _dataFormat = '?&apiversion=2&format=json&per_page=450' + _filter  # +_rnd_page#
+        _dataFormat = '?&apiversion=2&format=json&per_page=20' + _filter  # +_rnd_page#
 
         viewRes = self._getHTTP(_url, _attr, _view_id, _dataFormat)
         self._parser(viewRes,area)
